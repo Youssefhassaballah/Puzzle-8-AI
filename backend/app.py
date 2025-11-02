@@ -19,6 +19,12 @@ def get_algorithms():
     ]
     return jsonify(algorithms)
 
+def is_solvable( state):
+    flat = [num for row in state for num in row if num != 0]
+    inv = sum(1 for i in range(len(flat)) for j in range(i+1, len(flat)) if flat[i] > flat[j])
+    return inv % 2 == 0
+
+
 @app.route('/api/run-algorithm', methods=['POST'])
 def run_algorithm():
     """Run the specified algorithm on the given puzzle state"""

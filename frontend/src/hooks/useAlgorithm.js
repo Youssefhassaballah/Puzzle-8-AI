@@ -52,6 +52,7 @@ export const useAlgorithm = () => {
     progress,
     results,
     error,
+    setResults,
     executeAlgorithm,
     reset
   };

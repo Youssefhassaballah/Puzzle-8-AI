@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Brain, Info } from 'lucide-react';
+import { Brain } from 'lucide-react';
 
 // Hooks
 import { useTheme } from '../hooks/useTheme';
@@ -36,6 +36,7 @@ const SearchVisualizer = () => {
     isRunning, 
     progress, 
     results, 
+    setResults, 
     error,
     executeAlgorithm 
   } = useAlgorithm();
@@ -51,10 +52,10 @@ const SearchVisualizer = () => {
       // Update puzzle with results from backend
       if (result.found && result.path && result.path.length > 0) {
         updatePuzzle(currentPuzzle, result.moves);
-        
-        // Show success notification
+        setResults(result); // ✅ store results
         console.log(`✅ ${selectedAlgorithm.toUpperCase()} found solution in ${result.cost} moves!`);
       } else {
+        setResults(result); // ✅ even if not found
         console.log(`❌ ${selectedAlgorithm.toUpperCase()} could not find solution.`);
       }
     } catch (error) {
@@ -63,7 +64,7 @@ const SearchVisualizer = () => {
     }
   };
 
-  // FIXED: Auto-play moves when results are available
+  // Auto-play moves when results are available
   useEffect(() => {
     if (!isPlaying || !results || !results.path) return;
 
@@ -74,8 +75,6 @@ const SearchVisualizer = () => {
           setIsPlaying(false);
           return prev;
         }
-        
-        // Update the puzzle board immediately when moving to next step
         setPuzzleState(results.path[nextIndex], nextIndex);
         return nextIndex;
       });
@@ -84,10 +83,9 @@ const SearchVisualizer = () => {
     return () => clearInterval(timer);
   }, [isPlaying, results, playbackSpeed, setCurrentMoveIndex, setPuzzleState]);
 
-  // FIXED: Update puzzle visualization when move index changes
+  // Update puzzle visualization when move index changes
   useEffect(() => {
     if (results && results.path && results.path.length > 0) {
-      // Always show the state at currentMoveIndex from the path
       const targetState = results.path[currentMoveIndex];
       if (targetState && JSON.stringify(currentPuzzle) !== JSON.stringify(targetState)) {
         setPuzzleState(targetState, currentMoveIndex);
@@ -113,7 +111,6 @@ const SearchVisualizer = () => {
 
   const handlePlayPause = () => {
     if (!isPlaying && results && results.path && currentMoveIndex >= results.path.length - 1) {
-      // If at the end, restart from beginning
       setPuzzleState(results.path[0], 0);
       setCurrentMoveIndex(0);
     }
@@ -124,19 +121,23 @@ const SearchVisualizer = () => {
     generateRandom();
     setIsPlaying(false);
     setCurrentMoveIndex(0);
+    setResults(null);
   };
+
 
   const handleResetPuzzle = () => {
     resetPuzzle();
     setIsPlaying(false);
     setCurrentMoveIndex(0);
+    setResults(null); // ✅ clear old results
   };
-
+  
   const handleManualInput = (input) => {
     const result = setManualInput(input);
     if (result.success) {
       setIsPlaying(false);
       setCurrentMoveIndex(0);
+      setResults(null);
     }
     return result;
   };
@@ -168,8 +169,6 @@ const SearchVisualizer = () => {
     : 'bg-gradient-to-br from-blue-50 to-cyan-50 text-gray-800';
 
   const isSolved = isPuzzleSolved(currentPuzzle);
-
-  // Calculate move display (starting from 0)
   const totalMoves = results?.moves?.length || 0;
   const currentMoveDisplay = Math.min(currentMoveIndex, totalMoves - 1);
 
@@ -194,7 +193,6 @@ const SearchVisualizer = () => {
         </motion.div>
         <p className="text-lg opacity-70">Generate random puzzles or input your own</p>
         
-        {/* Error Display */}
         {error && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -248,7 +246,6 @@ const SearchVisualizer = () => {
               
               <PuzzleGrid puzzle={currentPuzzle} className="mb-6" />
 
-              {/* Move Progress Indicator */}
               {results && results.path && (
                 <div className="mb-4 text-center">
                   <span className="text-sm text-gray-600 dark:text-gray-400">
@@ -275,7 +272,6 @@ const SearchVisualizer = () => {
                 algorithms={ALGORITHMS}
               />
 
-              {/* Progress Bar */}
               {isRunning && (
                 <div className="mb-6">
                   <div className="flex justify-between text-sm mb-2">
@@ -292,11 +288,10 @@ const SearchVisualizer = () => {
                 </div>
               )}
 
-              {/* Move Timeline */}
               {results && results.moves && results.moves.length > 0 && (
                 <MoveTimeline
                   moves={results.moves}
-                  currentMoveIndex={currentMoveDisplay} // Now starts from 0
+                  currentMoveIndex={currentMoveDisplay}
                   isPlaying={isPlaying}
                   playbackSpeed={playbackSpeed}
                   onPlayPause={handlePlayPause}
@@ -309,7 +304,6 @@ const SearchVisualizer = () => {
             </div>
           </motion.div>
 
-          {/* Right Panel - Results Summary */}
           <ResultsPanel
             results={results}
             algorithm={selectedAlgorithm}
