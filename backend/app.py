@@ -41,7 +41,10 @@ def run_algorithm():
             return jsonify({'error': 'Invalid start_state format. Must be 3x3 grid.'}), 400
         
         # Initialize the appropriate solver
+        solvable = is_solvable(start_state)
         if algorithm == 'dfs':
+            if not solvable:
+                return jsonify({'error': 'The provided puzzle state is unsolvable.'}), 400
             solver = DFS(start_state)
         elif algorithm == 'bfs':
             solver = BFS(start_state)
