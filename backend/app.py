@@ -3,7 +3,7 @@ from flask_cors import CORS
 from algorithms.dfs import DFS
 from algorithms.bfs import BFS
 from algorithms.ids import IDS
-from algorithms.a_star import AStar
+from algorithms.a_star import AStarM, AStarE
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for all routes
@@ -15,7 +15,8 @@ def get_algorithms():
         {'value': 'dfs', 'label': 'Depth-First Search (DFS)'},
         {'value': 'bfs', 'label': 'Breadth-First Search (BFS)'},
         {'value': 'ids', 'label': 'Iterative DFS (IDS)'},
-        {'value': 'a_star', 'label': 'A* Search'}
+        { 'value': 'a_star_m', 'label': 'A* Search using manhattan_distance' },
+        { 'value': 'a_star_e', 'label': 'A* Search using Euclidean Distance' }
     ]
     return jsonify(algorithms)
 
@@ -50,8 +51,10 @@ def run_algorithm():
             solver = BFS(start_state)
         elif algorithm == 'ids':
             solver = IDS(start_state)
-        elif algorithm == 'a_star':
-            solver = AStar(start_state)
+        elif algorithm == 'a_star_m':
+            solver = AStarM(start_state)
+        elif algorithm == 'a_star_e':
+            solver = AStarE(start_state)
         else:
             return jsonify({'error': f'Unknown algorithm: {algorithm}'}), 400
         

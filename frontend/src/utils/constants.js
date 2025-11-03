@@ -2,7 +2,8 @@ export const ALGORITHMS = [
   { value: 'dfs', label: 'Depth-First Search (DFS)' },
   { value: 'bfs', label: 'Breadth-First Search (BFS)' },
   { value: 'ids', label: 'Iterative DFS (IDS)' },
-  { value: 'a_star', label: 'A* Search' }
+  { value: 'a_star_m', label: 'A* Search using manhattan_distance' },
+  { value: 'a_star_e', label: 'A* Search using Euclidean Distance' }
 ];
 
 export const INITIAL_PUZZLE = [
