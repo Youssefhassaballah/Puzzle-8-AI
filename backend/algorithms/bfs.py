@@ -34,8 +34,8 @@ class BFS:
         i, j = self.find_zero(state)
         directions = [
             (-1, 0, "Up"),
-            (1, 0, "Down"),
             (0, -1, "Left"),
+            (1, 0, "Down"),
             (0, 1, "Right")
         ]
         for di, dj, action in directions:
